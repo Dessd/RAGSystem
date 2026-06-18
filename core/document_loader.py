@@ -9,7 +9,6 @@ from typing import List
 from langchain_core.documents import Document
 from langchain_community.document_loaders import (
     PyPDFLoader,
-    UnstructuredMarkdownLoader,
     TextLoader,
 )
 
@@ -19,6 +18,18 @@ from config import config
 class UnsupportedFormatError(Exception):
     """不支持的文件格式"""
     pass
+
+
+def _detect_encoding(file_path: str) -> str:
+    """检测文件编码"""
+    for encoding in ["utf-8", "gbk", "gb2312", "utf-16"]:
+        try:
+            with open(file_path, "r", encoding=encoding) as f:
+                f.read()
+            return encoding
+        except (UnicodeDecodeError, UnicodeError):
+            continue
+    return "utf-8"
 
 
 def load_document(file_path: str) -> List[Document]:
@@ -41,10 +52,9 @@ def load_document(file_path: str) -> List[Document]:
 
     if ext == ".pdf":
         loader = PyPDFLoader(file_path)
-    elif ext == ".md":
-        loader = UnstructuredMarkdownLoader(file_path)
-    elif ext == ".txt":
-        loader = TextLoader(file_path, encoding="utf-8")
+    elif ext in (".md", ".txt"):
+        encoding = _detect_encoding(file_path)
+        loader = TextLoader(file_path, encoding=encoding)
     else:
         raise UnsupportedFormatError(
             f"不支持的文件格式: {ext}。支持的格式: {config.SUPPORTED_EXTENSIONS}"
