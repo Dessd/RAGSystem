@@ -31,7 +31,7 @@ class Config:
     DEFAULT_COLLECTION: str = "documind"
 
     # 支持的文件格式
-    SUPPORTED_EXTENSIONS: list = [".pdf", ".md", ".txt"]
+    SUPPORTED_EXTENSIONS: list = [".pdf", ".md", ".txt", ".docx", ".doc", ".html", ".htm"]
 
     # HuggingFace Embedding 模型
     EMBEDDING_MODEL: str = "BAAI/bge-small-zh-v1.5"

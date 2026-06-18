@@ -1,0 +1,9 @@
+__pycache__
+*.py[cod]
+.git
+.gitignore
+.env
+chroma_db/
+chat_history/
+screenshots/
+*.md

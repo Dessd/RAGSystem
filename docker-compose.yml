@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  documind:
+    build: .
+    container_name: documind
+    ports:
+      - "8501:8501"
+    volumes:
+      # 持久化向量数据库和对话历史
+      - ./chroma_db:/app/chroma_db
+      - ./chat_history:/app/chat_history
+    env_file:
+      - .env
+    restart: unless-stopped

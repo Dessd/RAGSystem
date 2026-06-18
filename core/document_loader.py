@@ -1,6 +1,6 @@
 """文档加载模块
 
-支持 PDF、Markdown、TXT 三种格式的文档加载。
+支持 PDF、Markdown、TXT、Word、HTML 格式的文档加载。
 """
 
 import os
@@ -32,6 +32,40 @@ def _detect_encoding(file_path: str) -> str:
     return "utf-8"
 
 
+def _load_word(file_path: str) -> List[Document]:
+    """加载 Word 文档"""
+    from docx import Document as DocxDocument
+
+    doc = DocxDocument(file_path)
+    paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+    content = "\n".join(paragraphs)
+
+    return [Document(
+        page_content=content,
+        metadata={"source": os.path.basename(file_path)}
+    )]
+
+
+def _load_html(file_path: str) -> List[Document]:
+    """加载 HTML 文档"""
+    from bs4 import BeautifulSoup
+
+    encoding = _detect_encoding(file_path)
+    with open(file_path, "r", encoding=encoding) as f:
+        soup = BeautifulSoup(f.read(), "html.parser")
+
+    # 移除 script 和 style 标签
+    for tag in soup(["script", "style"]):
+        tag.decompose()
+
+    text = soup.get_text(separator="\n", strip=True)
+
+    return [Document(
+        page_content=text,
+        metadata={"source": os.path.basename(file_path)}
+    )]
+
+
 def load_document(file_path: str) -> List[Document]:
     """加载单个文档
 
@@ -52,15 +86,19 @@ def load_document(file_path: str) -> List[Document]:
 
     if ext == ".pdf":
         loader = PyPDFLoader(file_path)
+        documents = loader.load()
     elif ext in (".md", ".txt"):
         encoding = _detect_encoding(file_path)
         loader = TextLoader(file_path, encoding=encoding)
+        documents = loader.load()
+    elif ext in (".docx", ".doc"):
+        documents = _load_word(file_path)
+    elif ext in (".html", ".htm"):
+        documents = _load_html(file_path)
     else:
         raise UnsupportedFormatError(
             f"不支持的文件格式: {ext}。支持的格式: {config.SUPPORTED_EXTENSIONS}"
         )
-
-    documents = loader.load()
 
     # 确保 metadata 包含 source（文件名）
     file_name = os.path.basename(file_path)

@@ -4,11 +4,15 @@
 
 ## 功能特性
 
-- 📄 支持 PDF/Markdown/TXT 文档上传
+- 📄 支持 PDF/Markdown/TXT/Word/HTML 文档上传
 - ✂️ 智能文档切分和向量化
 - 🔍 基于相似度/MMR 的智能检索
 - 💬 答案附带原文出处引用
 - 🗣️ 支持多轮对话
+- 🗄️ 多知识库管理，支持创建和切换
+- 💾 对话历史持久化保存
+- 📋 文档内容预览
+- 🐳 Docker 一键部署
 
 ## 技术架构
 
@@ -23,7 +27,7 @@
 | LLM | DeepSeek | 高性价比、中文能力强 |
 | 框架 | LangChain | RAG 流程编排 |
 | 向量数据库 | ChromaDB | 轻量级、本地运行 |
-| Embedding | BAAI/bge-small-zh-v1.5 | 本地中文向量模型，无需 API |
+| Embedding | 本地哈希 TF-IDF | 完全离线运行，无需 API |
 | 前端 | Streamlit | 快速原型展示 |
 
 ## 项目截图
@@ -34,20 +38,22 @@
 
 ## 快速开始
 
-### 1. 克隆项目
+### 方式一：本地运行
+
+#### 1. 克隆项目
 
 ```bash
-git clone https://github.com/yourname/documind.git
-cd documind
+git clone https://github.com/Dessd/RAGSystem.git
+cd RAGSystem
 ```
 
-### 2. 安装依赖
+#### 2. 安装依赖
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. 配置 API Key
+#### 3. 配置 API Key
 
 ```bash
 cp .env.example .env
@@ -55,13 +61,27 @@ cp .env.example .env
 # 获取地址：https://platform.deepseek.com/
 ```
 
-### 4. 运行
+#### 4. 运行
 
 ```bash
 streamlit run app.py
 ```
 
 浏览器会自动打开 http://localhost:8501
+
+### 方式二：Docker 部署
+
+```bash
+# 1. 配置环境变量
+cp .env.example .env
+# 编辑 .env 填入 API Key
+
+# 2. 构建并启动
+docker-compose up -d
+
+# 3. 访问
+# http://localhost:8501
+```
 
 ## 项目结构
 
@@ -71,10 +91,12 @@ documind/
 ├── requirements.txt             # Python 依赖
 ├── .env.example                 # 环境变量模板
 ├── .gitignore
+├── Dockerfile                   # Docker 构建文件
+├── docker-compose.yml           # Docker Compose 配置
 ├── app.py                       # Streamlit 主入口
 ├── config.py                    # 配置管理
 ├── core/
-│   ├── document_loader.py       # 文档加载（PDF/MD/TXT）
+│   ├── document_loader.py       # 文档加载（PDF/MD/TXT/Word/HTML）
 │   ├── text_splitter.py         # 文本分割策略
 │   ├── embeddings.py            # Embedding 模型封装
 │   ├── vector_store.py          # ChromaDB 向量存储
@@ -93,6 +115,16 @@ documind/
 
 ## 技术细节
 
+### 支持的文档格式
+
+| 格式 | 说明 |
+|------|------|
+| PDF | 使用 PyPDFLoader |
+| Markdown | 使用 TextLoader |
+| TXT | 使用 TextLoader |
+| Word (.docx) | 使用 python-docx |
+| HTML | 使用 BeautifulSoup |
+
 ### 文本分割策略
 
 使用 `RecursiveCharacterTextSplitter`，参数：
@@ -109,11 +141,11 @@ documind/
 
 ## TODO
 
-- [ ] 支持更多文档格式（Word、HTML）
-- [ ] 对话历史持久化
-- [ ] 支持多知识库切换
-- [ ] 添加文档预览功能
-- [ ] 部署为 Docker 容器
+- [x] 支持更多文档格式（Word、HTML）
+- [x] 对话历史持久化
+- [x] 支持多知识库切换
+- [x] 添加文档预览功能
+- [x] 部署为 Docker 容器
 
 ## License
 
