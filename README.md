@@ -26,6 +26,12 @@
 | Embedding | BAAI/bge-small-zh-v1.5 | 本地中文向量模型，无需 API |
 | 前端 | Streamlit | 快速原型展示 |
 
+## 项目截图
+
+![页面展示1](screenshots/页面展示1.png)
+
+![页面展示2](screenshots/页面展示2.png)
+
 ## 快速开始
 
 ### 1. 克隆项目
